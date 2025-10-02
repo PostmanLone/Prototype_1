@@ -1,0 +1,27 @@
+name: prototype_1
+description: Aesthetic Flutter prototype for student tracking (web-friendly) that talks to a FastAPI backend.
+publish_to: "none"
+version: 0.2.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.2
+  shared_preferences: ^2.2.3
+  google_fonts: ^6.2.1
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
