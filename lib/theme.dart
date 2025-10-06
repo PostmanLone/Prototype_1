@@ -6,6 +6,7 @@ class Palette {
   static const Color forest = Color(0xFF3F4F44); // #3F4F44
   static const Color accent = Color(0xFFA27B5C); // #A27B5C
   static const Color sand = Color(0xFFDCD7C9); // #DCD7C9
+  static const Color clay = Color(0xFFA27B5C);
 }
 
 class AppTheme {
@@ -19,8 +20,6 @@ class AppTheme {
         onSecondary: Colors.white,
         error: Color(0xFFB00020),
         onError: Colors.white,
-        background: Palette.sand,
-        onBackground: Color(0xFF111111),
         surface: Colors.white,
         onSurface: Color(0xFF1F2937),
       ),

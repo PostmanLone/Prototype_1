@@ -1,11 +1,16 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'theme.dart';
+
+import 'theme.dart'; // AppTheme.light()
 import 'api.dart';
+
+import 'screens/onboarding_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/signup_screen.dart';
 import 'screens/parent_screen.dart';
 import 'screens/staff_screen.dart';
-import 'screens/settings_screen.dart';
+// import 'screens/settings_screen.dart'; // add route later if you need it
 
 void main() => runApp(const StudentTrackingApp());
 
@@ -22,20 +27,24 @@ class _StudentTrackingAppState extends State<StudentTrackingApp> {
   @override
   void initState() {
     super.initState();
-    _load();
+    _loadPersisted();
   }
 
-  Future<void> _load() async {
+  Future<void> _loadPersisted() async {
     final sp = await SharedPreferences.getInstance();
+    final savedToken = sp.getString('token');
+    final savedRole = sp.getString('role') ?? 'parent';
+    final savedUrl = sp.getString('api_base_url');
+    if (savedUrl != null && savedUrl.isNotEmpty) {
+      Api.setBaseUrl(savedUrl);
+    }
     setState(() {
-      token = sp.getString('token');
-      role = sp.getString('role') ?? 'parent';
-      final savedUrl = sp.getString('api_base_url');
-      if (savedUrl != null && savedUrl.isNotEmpty) Api.setBaseUrl(savedUrl);
+      token = savedToken;
+      role = savedRole;
     });
   }
 
-  void onSignedIn(String t, String r) async {
+  Future<void> _onSignedIn(String t, String r) async {
     final sp = await SharedPreferences.getInstance();
     await sp.setString('token', t);
     await sp.setString('role', r);
@@ -45,7 +54,7 @@ class _StudentTrackingAppState extends State<StudentTrackingApp> {
     });
   }
 
-  void onSignOut() async {
+  Future<void> _signOutAndGo(BuildContext context) async {
     final sp = await SharedPreferences.getInstance();
     await sp.remove('token');
     await sp.remove('role');
@@ -53,22 +62,58 @@ class _StudentTrackingAppState extends State<StudentTrackingApp> {
       token = null;
       role = 'parent';
     });
+    if (context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Student Tracking',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
+      theme: AppTheme.light(), // <— named arg, not positional
+      initialRoute: '/onboarding',
       routes: {
-        '/settings': (_) => SettingsScreen(onSaved: () => setState(() {})),
+        '/onboarding': (_) => const OnboardingScreen(),
+
+        '/login': (ctx) => LoginScreen(
+              onSignedIn: (t, r) async {
+                await _onSignedIn(t, r);
+                if (!ctx.mounted) return;
+                Navigator.pushReplacementNamed(
+                  ctx,
+                  r == 'parent' ? '/parent' : '/staff',
+                  arguments: t,
+                );
+              },
+            ),
+
+        '/signup': (_) => const SignupScreen(),
+
+        '/parent': (ctx) {
+          final argToken =
+              (ModalRoute.of(ctx)?.settings.arguments as String?) ??
+                  token ??
+                  '';
+          return ParentScreen(
+            token: argToken,
+            onSignOut: () => _signOutAndGo(ctx),
+          );
+        },
+
+        '/staff': (ctx) {
+          final argToken =
+              (ModalRoute.of(ctx)?.settings.arguments as String?) ??
+                  token ??
+                  '';
+          return StaffScreen(
+            token: argToken,
+            onSignOut: () => _signOutAndGo(ctx),
+          );
+        },
+
+        // '/settings': (_) => const SettingsScreen(),
       },
-      home: token == null
-          ? LoginScreen(onSignedIn: onSignedIn)
-          : (role == 'staff' || role == 'admin'
-                ? StaffScreen(token: token!, onSignOut: onSignOut)
-                : ParentScreen(token: token!, onSignOut: onSignOut)),
     );
   }
 }
