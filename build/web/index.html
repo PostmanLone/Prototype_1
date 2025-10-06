@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- IMPORTANT: base must be / so assets and main.dart.js resolve correctly on Render -->
+    <base href="/" />
+
+    <title>Student Tracking</title>
+    <meta name="description" content="Student tracking prototype" />
+
+    <!-- PWA / theme -->
+    <meta name="theme-color" content="#3F4F44" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/png" href="icons/Icon-192.png" />
+
+    <!-- iOS add-to-home-screen support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="apple-touch-icon" href="icons/Icon-192.png" />
+  </head>
+
+  <body>
+    <!-- Flutter loader -->
+    <script src="flutter.js" defer></script>
+    <script>
+      // Build we recommended: --web-renderer=html --pwa-strategy=none
+      // So no service worker version is supplied here.
+      window.addEventListener('load', function () {
+        _flutter.loader.loadEntrypoint({
+          serviceWorker: { serviceWorkerVersion: null }, // no SW
+          onEntrypointLoaded: function (engineInitializer) {
+            engineInitializer
+              .initializeEngine({ renderer: "html" })
+              .then(function (appRunner) {
+                appRunner.runApp();
+              });
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

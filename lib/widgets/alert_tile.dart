@@ -73,10 +73,10 @@ class _AlertTileState extends State<AlertTile> {
         children: [
           if (hasExtra) ...infoRows,
           if (!hasExtra)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6.0),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 6.0),
               child: Text('No extra details.',
-                  style: const TextStyle(color: Colors.black54)),
+                  style: TextStyle(color: Colors.black54)),
             ),
 
           // Toggle raw JSON
@@ -95,7 +95,7 @@ class _AlertTileState extends State<AlertTile> {
     );
   }
 
-  static String? _str(dynamic v) => v == null ? null : v.toString();
+  static String? _str(dynamic v) => v?.toString();
 
   static String _labelize(String k) {
     return k
